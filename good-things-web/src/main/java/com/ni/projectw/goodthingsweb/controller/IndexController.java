@@ -1,4 +1,4 @@
-package com.ni.projectw.goodthingsweb;
+package com.ni.projectw.goodthingsweb.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
