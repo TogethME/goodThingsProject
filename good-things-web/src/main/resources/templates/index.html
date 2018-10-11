@@ -10,7 +10,9 @@
             <input type="text" id="phone" name="phone" placeholder="请输入手机号" maxlength="11"><br>
             <img id="idyCodeImg">
             <input  type="text" id="idy" name="idy" placeholder="请输入图片验证码" maxlength="5" ><br>
-            <button type="submit" id = "submitButton">提交</button>
+            <input  type="text" id="cookie" name="cookie"  style="display: none;">
+            <button type="button" id = "submitButton">获取验证码</button>
+            <input  type="text" id="phoneIdy" name="phoneIdy" placeholder="请输入短信验证码" maxlength="5" ><br>
             <button type="reset">重置</button>
         </form>
     </div>
@@ -23,8 +25,17 @@
         $.get("http://haoren.dc.10086.cn/hrhs/sendImageCode.do?channelId=3&timestamp="+new Date(),function (result) {
                 var imageStr = "data:image/png;base64," + result.result.imageStr;
                 $("#idyCodeImg").attr("src",imageStr).show();
+                $("#cookie").val(result.result.cookie);
+
             }
-        )
+        );
+
+        $("#submitButton").bind("click",function(){
+            $.get("/getPhoneIdy",function (result) {
+                    alert(result);
+                }
+            );
+        });
 
 
     });
