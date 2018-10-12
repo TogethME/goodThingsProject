@@ -17,11 +17,11 @@ import java.util.Map;
 public class LoginController {
 
     private final String IDY_SUBMIT_URL = "http://haoren.dc.10086.cn/hrhs/sendCode.do?";
-    private final String LOGIN_SUBMIT_URL = "http://dc.10086.cn/SSOServer/user/login.do";
+    private final String LOGIN_SUBMIT_URL = "http://dc.10086.cn/SSOServer/user/login.do?";
 
     @GetMapping("/getPhoneIdy")
     @ResponseBody
-    public String create(String phone,String idy,String cookie) throws HttpProcessException {
+    public String getPhoneIdy(String phone,String idy,String cookie) throws HttpProcessException {
         String url = IDY_SUBMIT_URL;
         url += "code="+idy + "&mobile=" +phone +"&channelId=3&timestamp="+System.currentTimeMillis();
         HttpConfig config = HttpConfig.custom();
@@ -34,24 +34,25 @@ public class LoginController {
 
     @GetMapping("/login")
     @ResponseBody
-    public String toLogin(String phone,String dxCode,String imaCode) throws HttpProcessException {
+    public String toLogin(String phone,String idy,String phoneIdy) throws HttpProcessException {
+        String url = LOGIN_SUBMIT_URL;
 
-
-        String url ="http://haoren.dc.10086.cn/hrhs/sendImageCode.do?channelId=3&timestamp="+System.currentTimeMillis();
+        url += "phone="+phone+"&dxCode="+phoneIdy+"&imgCode="+idy+"&channelId=3&redirectURL=100&type=0&timestamp="+System.currentTimeMillis();
         HttpConfig config = HttpConfig.custom();
-        Header[] headers=HttpHeader.custom().userAgent("Mozilla/5.0").build();
+        Header[] headers=HttpHeader.custom().userAgent("Mozilla/5.0")
+                .other("Accept","application/json, text/plain, */*")
+                .other("Accept-Encoding: ","gzip, deflate")
+                .other("Accept-Language: "," zh-CN,zh;q=0.9")
+                .other("Host"," dc.10086.cn")
+                .other("Origin","http://haoren.dc.10086.cn")
+                .other("Proxy-Connection","keep-alive")
+                .other("Referer","http://haoren.dc.10086.cn")
+                .other("X-Requested-With","XMLHttpRequest")
+                .other("Content-Length","117")
+                .build();
         config.headers(headers);
         config.url(url);
-        Map<String, Object> map = new HashMap<>();
-        map.put("phone",phone);
-        map.put("dxCode",dxCode);
-        map.put("imaCode",imaCode);
-        map.put("channelId",3);
-        map.put("redirectURL",100);
-        map.put("type",0);
-        map.put("timestamp",System.currentTimeMillis());
-        config.map(map);
-        String options = HttpClientUtil.options(config);
+        String options = HttpClientUtil.get(config);
         return options;
     }
 
