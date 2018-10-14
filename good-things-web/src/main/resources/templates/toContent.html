@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>填写好人好事</title>
+</head>
+<body>
+    <div>
+        <form action="/login">
+            <input type="text" id="phone" name="phone" placeholder="请输入手机号" maxlength="11"><br>
+            <img id="idyCodeImg">
+            <input  type="text" id="idy" name="idy" placeholder="请输入图片验证码" maxlength="5" ><br>
+            <input  type="text" id="cookie" name="cookie"  style="display: none;">
+            <button type="button" id = "submitButton">填充好人好事</button>
+            <button type="submit">提交</button>
+            <button type="reset">重置</button>
+        </form>
+    </div>
+
+</body>
+
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.get("http://haoren.dc.10086.cn/hrhs/sendImageCode.do?channelId=3&timestamp="+new Date(),function (result) {
+                var imageStr = "data:image/png;base64," + result.result.imageStr;
+                $("#idyCodeImg").attr("src",imageStr).show();
+                $("#cookie").val(result.result.cookie);
+
+            }
+        );
+
+        $("#submitButton").bind("click",function(){
+            $.get("/getPhoneIdy",{phone:$("#phone").val(),idy:$("#idy").val(),cookie:$("#cookie").val()},function (result) {
+                    alert(result);
+                }
+            );
+        });
+
+
+    });
+
+</script>
+</html>
