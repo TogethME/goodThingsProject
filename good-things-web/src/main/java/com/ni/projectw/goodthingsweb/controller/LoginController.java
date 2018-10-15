@@ -5,13 +5,20 @@ import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
 import com.arronlong.httpclientutil.common.HttpHeader;
 import com.arronlong.httpclientutil.exception.HttpProcessException;
+import com.ni.projectw.goodthingsweb.dao.UserMapper;
+import com.ni.projectw.goodthingsweb.model.User;
+import com.ni.projectw.goodthingsweb.pojo.GoodThings;
 import org.apache.http.Header;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class LoginController {
+
+    @Autowired
+    private UserMapper userMapper;
 
     private final String IDY_SUBMIT_URL = "http://haoren.dc.10086.cn/hrhs/sendCode.do?";
     private final String LOGIN_SUBMIT_URL = "http://dc.10086.cn/SSOServer/user/login.do?";
@@ -62,36 +69,26 @@ public class LoginController {
     }
 
     //推荐好人好事
-    public String recommend(
-            String srcMobile
-            ,String srcName
-            ,String srcProvince
-            ,String srcCity
-            ,String categoryType
-            ,String recName
-            ,String recProvince
-            ,String recCity
-            ,String content
-    ) throws HttpProcessException {
+    public String recommend(GoodThings goodThings) throws HttpProcessException {
         String url = RECOMMEND_GOODPEOPLE_URL;
 
-        url +=  "srcMobile="+srcMobile
+        url +=  "srcMobile="+goodThings.getSrcMobile()
                 //电话
-                +"&srcName="+srcName
+                +"&srcName="+goodThings.getSrcName()
                 //推荐人
-                +"&srcProvince="+srcProvince
+                +"&srcProvince="+goodThings.getSrcProvince()
                 //推荐人省份
-                +"&srcCity="+srcCity
+                +"&srcCity="+goodThings.getSrcCity()
                 //推荐人城市
-                +"&categoryType="+categoryType
+                +"&categoryType="+goodThings.getCategoryType()
                 //被推荐人名字
-                +"&recName="+recName
+                +"&recName="+goodThings.getRecName()
                 //被推荐人省份
-                +"&recProvince="+recProvince
+                +"&recProvince="+goodThings.getRecProvince()
                 //被推荐人城市
-                +"&recCity="+recCity
+                +"&recCity="+goodThings.getRecCity()
                 //推荐内容
-                +"&content="+content
+                +"&content="+goodThings.getContent()
                 +"&timestamp="+System.currentTimeMillis();
         HttpConfig config = HttpConfig.custom();
         Header[] headers=HttpHeader.custom().userAgent("Mozilla/5.0")
@@ -119,6 +116,21 @@ public class LoginController {
         JSONObject jsonObject = JSONObject.parseObject(option.substring(1,option.length()-1));
         COOKIE_TOKEN = "haoren_mobile="+phone+"; fangshuaiSheji="+jsonObject.getString("token");
         return jsonObject.getString("returnCode");
+    }
+
+    @GetMapping("/insertUser")
+    @ResponseBody
+    public String insertUser() throws HttpProcessException {
+        User user = new User();
+        user.setName("wangbin");
+        userMapper.insert(user);
+        return "插入成功,user=" +user;
+    }
+
+    @GetMapping("/getAll")
+    @ResponseBody
+    public String getAll() throws HttpProcessException {
+        return userMapper.selectAll().toString();
     }
 
 }
